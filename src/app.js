@@ -1,0 +1,28 @@
+import express from "express";
+import ordersRoutes from "./routes/orders.routes.js";
+
+const app = express();
+
+app.use("/", (req, res, next) => {
+    console.log(req.url);
+    next();
+});
+
+//sample request
+//http://localhost:4000/api/orders?status=paid&customerId=123&createdAfter=2026-01-01T00:00:00Z&limit=10&sort=createdAt&direction=asc&cursor=2026-01-01T01:01:00Z
+app.use("/api/orders", ordersRoutes);
+
+app.use((err, req, res, next) => {
+    const errMsg = {
+        error: {
+            code: err.code,
+            message: err.message,
+            details: err.details,
+        },
+    };
+    res.status(500).send(errMsg);
+});
+
+app.listen(4000, () => {
+    console.log("App listening on port 4000");
+});
