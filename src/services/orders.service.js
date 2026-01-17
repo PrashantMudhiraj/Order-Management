@@ -8,9 +8,9 @@ export async function fetchOrders(query) {
     const filters = buildOrderFilters(query);
     const sort = buildOrderSort(query);
 
-    const [sortField, sortValue] = Object.entries(sort)[0];
+    const [sortField, sortValue] = Object.entries(sort)[0]; // [[key , value] [key , value ]]
 
-    const { limit, cursorFilter } = buildCursorPagination(
+    const { limit, cursorFilters } = buildCursorPagination(
         query,
         sortField,
         sortValue === 1 ? "asc" : "desc",
@@ -19,7 +19,7 @@ export async function fetchOrders(query) {
 
     const finalQuery = {
         ...filters,
-        ...cursorFilter,
+        ...cursorFilters,
     };
 
     console.log({ finalQuery, sort, limit });

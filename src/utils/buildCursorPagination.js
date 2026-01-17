@@ -6,6 +6,7 @@ export function buildCursorPagination(
     sortDirection,
     filters = {},
 ) {
+    const cursorFilters = { ...filters };
     const limit = Math.min(Number(query.limit) || 20, 50);
 
     if (Number.isNaN(limit) || limit <= 0) {
@@ -27,19 +28,47 @@ export function buildCursorPagination(
     }
 
     // ensure createdAt exists
-    filters.createdAt = filters.createdAt || {};
+    cursorFilters.createdAt = cursorFilters.createdAt || {};
 
     if (sortDirection === "desc") {
         // move downward (older)
-        filters.createdAt.$lt = cursorDate;
+        cursorFilters.createdAt.$lt = cursorDate;
     } else if (sortDirection === "asc") {
         // move upward (newer)
-        filters.createdAt.$gt = cursorDate;
+        cursorFilters.createdAt.$gt = cursorDate;
     } else {
         throw new ValidationError({
             sort: "Invalid sort direction",
         });
     }
 
-    return { limit, filters };
+    return { limit, cursorFilters };
 }
+
+/**
+ * createdAfter → $gt, createdBefore → $lt
+ * ASC → cursor uses $gt, DESC → cursor uses $lt
+ */
+
+//2026-01-01T00:00:00Z - createdAfter
+//2026-01-01T01:00:00Z
+//2026-01-01T02:00:00Z
+//2026-01-01T03:00:00Z
+//2026-01-01T04:00:00Z
+//2026-01-01T05:00:00Z
+
+//sort desc -> top(newer) - bottom(old)
+//2026-01-01T05:00:00Z
+//2026-01-01T04:00:00Z
+//2026-01-01T03:00:00Z -> cursor ($lt)
+//2026-01-01T02:00:00Z
+//2026-01-01T01:00:00Z
+//2026-01-01T00:00:00Z -> createdAfter ($gt)
+
+//sort asc  -> top(old) - bottom(newer)
+//2026-01-01T00:00:00Z - createdAfter ($gt) - deleted
+//2026-01-01T01:00:00Z
+//2026-01-01T02:00:00Z
+//2026-01-01T03:00:00Z - cursor($gt) - merged (client already seen top 3 records)
+//2026-01-01T04:00:00Z
+//2026-01-01T05:00:00Z

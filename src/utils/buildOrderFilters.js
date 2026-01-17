@@ -20,6 +20,7 @@ export function buildOrderFilters(query) {
         filters.createdAt = {};
 
         if (query.createdAfter) {
+            //minimum value
             const date = new Date(query.createdAfter);
 
             if (Number.isNaN(date.getTime())) {
@@ -40,6 +41,7 @@ export function buildOrderFilters(query) {
         }
 
         if (query.createdBefore) {
+            //maximum value
             const date = new Date(query.createdBefore);
 
             if (Number.isNaN(date.getTime())) {
