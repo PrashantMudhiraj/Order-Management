@@ -5,6 +5,7 @@ export default class ValidationError extends ApiError {
         super({
             code: "VALIDATION_ERROR",
             message: "Request validation failed",
+            statusCode: 400,
             details: {
                 fields: fieldErrors,
             },
