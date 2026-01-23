@@ -3,14 +3,23 @@ import ordersRoutes from "./routes/orders.routes.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import authenticate from "./middlewares/authenticate.js";
 import authorizeAdmin from "./middlewares/authorizeAdmin.js";
-import ipRateLimit from "./middlewares/ipRateLimit.js";
-import userRateLimit from "./middleware/useRateLimit.js";
+import { ipRateLimit } from "./middlewares/ipRateLimit.js";
+import { userRateLimit } from "./middlewares/userRateLimit.js";
+// import rateLimit from "express-rate-limiter"; //external package for rateLimiting
+
+// const limiter = rateLimit({
+//     windowMs: 60 * 60 * 100,
+//     limit: 200,
+//     message: "Too Many request, Please try again later",
+// });
 
 const app = express();
 
-app.use(ipRateLimit);
-// app.use(authenticate);
-app.use(userRateLimit);
+app.set("trust proxy", 1);
+
+// app.use(ipRateLimit);
+// // app.use(authenticate);
+// app.use(userRateLimit);
 
 app.use("/", (req, res, next) => {
     console.log(req.url);
