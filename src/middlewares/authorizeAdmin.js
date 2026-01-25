@@ -1,7 +1,7 @@
 import { ForbiddenError } from "../errors/AuthError.js";
 
 export default (req, res, next) => {
-    console.log(req.ip);
+    // console.log(req.ip);
     // if (req?.user?.role === "admin") {
     //     return next();
     // }

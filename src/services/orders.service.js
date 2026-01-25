@@ -22,7 +22,7 @@ export async function fetchOrders(query) {
         ...cursorFilters,
     };
 
-    console.log({ finalQuery, sort, limit });
+    // console.log({ finalQuery, sort, limit });
 
     // const orders = await Order.find(finalQuery)
     //     .sort(sort)

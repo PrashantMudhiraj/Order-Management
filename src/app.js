@@ -1,10 +1,15 @@
 import express from "express";
-import ordersRoutes from "./routes/orders.routes.js";
+import swaggerUi from "swagger-ui-express";
+import { openApiSpec } from "./docs/swagger.js";
+import ordersRoutes from "./routes/v1/orders.routes.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import authenticate from "./middlewares/authenticate.js";
 import authorizeAdmin from "./middlewares/authorizeAdmin.js";
 import { ipRateLimit } from "./middlewares/ipRateLimit.js";
 import { userRateLimit } from "./middlewares/userRateLimit.js";
+import { log } from "./logger/log.js";
+import { asyncLocalStorage } from "./logger/asyncLocalStorage.js";
+import { randomUUID } from "crypto";
 // import rateLimit from "express-rate-limiter"; //external package for rateLimiting
 
 // const limiter = rateLimit({
@@ -20,10 +25,21 @@ app.set("trust proxy", 1);
 // app.use(ipRateLimit);
 // // app.use(authenticate);
 // app.use(userRateLimit);
+// src/app.js
 
-app.use("/", (req, res, next) => {
-    console.log(req.url);
-    next();
+app.use(
+    "/docs",
+    swaggerUi.serve,
+    swaggerUi.setup(openApiSpec, {
+        explorer: true,
+        swaggerOptions: {
+            persistAuthorization: true,
+        },
+    }),
+);
+
+app.use((req, res, next) => {
+    asyncLocalStorage.run({ requestId: randomUUID() }, () => next());
 });
 
 //sample request
